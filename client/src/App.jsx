@@ -5,6 +5,8 @@ import {useEffect, useState} from "react";
 function App() {
   const [users, setUsers] = useState([]);
   const [fillterUsers, setfillterUsers] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userData, setUserData] = useState({name:"",age:"",city:""});
 
   const getAllUsers = async () => {
     await axios.get("http://localhost:8080/users").then((res) => {
@@ -32,7 +34,46 @@ function App() {
 
   useEffect(() => {
     getAllUsers(); 
-  },[])
+  },[]);
+
+  //close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    getAllUsers(); 
+  }
+
+  const handleSubmit  = async (e) => {
+    e.preventDefault();
+    if (userData.id) {
+      await axios.patch(`http://localhost:8080/users/${userData.id}`,userData).then((res) => {
+        console.log(res);
+      });
+    }else {
+      await axios.post("http://localhost:8080/users",userData).then((res) => {
+          console.log(res);
+        });
+      }
+      closeModal();
+      setUserData({name:"",age:"",city:""});
+  };
+
+  const handleData = (e) => {
+    setUserData({...userData,[e.target.name]:e.target.value});
+  }
+
+  //Add Users
+
+  const HandleAddRecord = () => {
+    setUserData({name:"",age:"",city:""});
+    setIsModalOpen(true);
+  }
+
+  //Update User Data
+
+  const handleUpdateRecord = (user) => {
+    setUserData(user);
+    setIsModalOpen(true);
+  }
 
   return (
     <>
@@ -40,7 +81,7 @@ function App() {
         <h3>Crud Application Use React and Node Js</h3>
         <div className="input-search">
           <input type="search" placeholder='Search text Here....' onChange={handleSearchChange}/>
-          <button className = "btn green">Add Users</button>
+          <button className = "btn green" onClick={HandleAddRecord}>Add Users</button>
         </div>
         <table className="table">
           <thead>
@@ -61,7 +102,7 @@ function App() {
                 <td>{user.name}</td>
                 <td>{user.age}</td>
                 <td>{user.city}</td>
-                <td><button className = "btn green">Edit</button></td>
+                <td><button className = "btn green" onClick={() => handleUpdateRecord(user)}>Edit</button></td>
                 <td><button className = "btn red" onClick={() => handleDelete(user.id)}>Delete</button></td>
               </tr>
               )
@@ -69,6 +110,27 @@ function App() {
             
           </tbody>
         </table>
+        {isModalOpen && (
+          <div className="modal">
+            <div className="modal-content">
+              <span className="close" onClick={closeModal}>&times;</span>
+              <h2>{userData.id ? "Update Record" : "Add Record"}</h2>
+              <div className="input-group">
+                <label htmlFor="name">Full Name</label>
+                <input type="text" name="name" id="name" value={userData.name} onChange={handleData}/>
+              </div>
+              <div className="input-group">
+                <label htmlFor="age">Age</label>
+                <input type="number" name="age" id="age"  value={userData.age} onChange={handleData}/>
+              </div>
+              <div className="input-group">
+                <label htmlFor="city">City</label>
+                <input type="text" name="city" id="city"  value={userData.city} onChange={handleData}/>
+              </div>
+              <button className='btn green' onClick={handleSubmit}>{userData.id ? "Update User" : "Add User"}</button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   )
