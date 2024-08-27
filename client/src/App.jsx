@@ -94,9 +94,9 @@ function App() {
           <input type="search" placeholder='Search text Here....' onChange={handleSearchChange}/>
           <button className = "btn green" onClick={HandleAddRecord}>Add Users</button>
         </div>
+        {flashMessage && <div className="flash-message">{flashMessage}</div>}
         <table className="table">
-          {/* Flash Message */}
-          {flashMessage && <div className="flash-message">{flashMessage}</div>}
+          
           <thead>
             <tr>
               <th>ID</th>
