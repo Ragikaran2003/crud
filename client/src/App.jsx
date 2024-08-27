@@ -7,6 +7,8 @@ function App() {
   const [fillterUsers, setfillterUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userData, setUserData] = useState({name:"",age:"",city:""});
+  const [flashMessage, setFlashMessage] = useState("");
+
 
   const getAllUsers = async () => {
     await axios.get("http://localhost:8080/users").then((res) => {
@@ -28,6 +30,7 @@ function App() {
       await axios.delete(`http://localhost:8080/users/${id}`).then((res) => {
         setUsers(res.data);
         setfillterUsers(res.data);
+        showFlashMessage("User Data Deleted Successfully");
       });
     }
   };
@@ -45,12 +48,12 @@ function App() {
   const handleSubmit  = async (e) => {
     e.preventDefault();
     if (userData.id) {
-      await axios.patch(`http://localhost:8080/users/${userData.id}`,userData).then((res) => {
-        console.log(res);
+      await axios.patch(`http://localhost:8080/users/${userData.id}`,userData).then(() => {
+        showFlashMessage("User Data Updated Successfully");
       });
     }else {
-      await axios.post("http://localhost:8080/users",userData).then((res) => {
-          console.log(res);
+      await axios.post("http://localhost:8080/users",userData).then(() => {
+        showFlashMessage("User Data Added Successfully");
         });
       }
       closeModal();
@@ -74,6 +77,14 @@ function App() {
     setUserData(user);
     setIsModalOpen(true);
   }
+//flash message
+  const showFlashMessage = (message) => {
+    setFlashMessage(message);
+    setTimeout(() => {
+      setFlashMessage("");
+    }, 3000); // Clear after 3 seconds
+  };
+  
 
   return (
     <>
@@ -84,6 +95,8 @@ function App() {
           <button className = "btn green" onClick={HandleAddRecord}>Add Users</button>
         </div>
         <table className="table">
+          {/* Flash Message */}
+          {flashMessage && <div className="flash-message">{flashMessage}</div>}
           <thead>
             <tr>
               <th>ID</th>
@@ -115,6 +128,7 @@ function App() {
             <div className="modal-content">
               <span className="close" onClick={closeModal}>&times;</span>
               <h2>{userData.id ? "Update Record" : "Add Record"}</h2>
+      
               <div className="input-group">
                 <label htmlFor="name">Full Name</label>
                 <input type="text" name="name" id="name" value={userData.name} onChange={handleData}/>

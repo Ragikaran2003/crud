@@ -140,3 +140,17 @@ h3 {
   border: 1px solid #ccc;
   outline: none;
 }
+
+.flash-message {
+  background-color: #4caf50; /* Green */
+  color: white;
+  padding: 10px;
+  margin-bottom: 15px;
+  text-align: center;
+  border-radius: 5px;
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
